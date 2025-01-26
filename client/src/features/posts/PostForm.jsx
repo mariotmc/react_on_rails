@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function PostForm({ post, headerText, onSubmit, buttonText }) {
-  const [formData, setFormData] = useState(post || { title: "", body: "" });
+  const [formData, setFormData] = useState(post || { title: "", body: "", image: "" });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,6 +23,16 @@ function PostForm({ post, headerText, onSubmit, buttonText }) {
             id="title"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="image">Image</label>
+          <input
+            type="file"
+            id="image"
+            accept="image/*"
+            onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
           />
         </div>
 
