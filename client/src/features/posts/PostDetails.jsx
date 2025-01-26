@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../../constants";
 
 function PostDetails() {
@@ -7,6 +7,7 @@ function PostDetails() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCurrentPost = async () => {
@@ -28,6 +29,19 @@ function PostDetails() {
     fetchCurrentPost();
   }, [id]);
 
+  const deletePost = async () => {
+    try {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        navigate("/");
+      } else {
+        setError(response.statusText);
+      }
+    } catch (error) {
+      setError(error);
+    }
+  };
+
   if (loading) return <h2>Loading...</h2>;
   if (error) return <h2>Error: {error}</h2>;
 
@@ -36,6 +50,8 @@ function PostDetails() {
       <h2>{post.title}</h2>
       <p>{post.body}</p>
       <Link to="/">Back to Home</Link>
+      {" | "}
+      <button onClick={() => deletePost}>Delete</button>
     </div>
   );
 }
