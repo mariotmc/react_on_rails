@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { API_URL } from "../../constants";
+import { fetchPostById, deletePost as deletePostService } from "../../services/postService";
 
 function PostDetails() {
   const { id } = useParams();
@@ -9,38 +9,29 @@ function PostDetails() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchCurrentPost = async () => {
-      try {
-        const response = await fetch(`${API_URL}/${id}`);
-        if (response.ok) {
-          const json = await response.json();
-          setPost(json);
-          setLoading(false);
-        } else {
-          setError(response.statusText);
-        }
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCurrentPost();
-  }, [id]);
+  const fetchCurrentPost = async () => {
+    try {
+      const data = await fetchPostById(id);
+      setPost(data);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const deletePost = async () => {
     try {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-      if (response.ok) {
-        navigate("/");
-      } else {
-        setError(response.statusText);
-      }
+      await deletePostService(id);
+      navigate("/");
     } catch (error) {
       setError(error);
     }
   };
+
+  useEffect(() => {
+    fetchCurrentPost();
+  }, [id]);
 
   if (loading) return <h2>Loading...</h2>;
   if (error) return <h2>Error: {error}</h2>;
@@ -53,7 +44,7 @@ function PostDetails() {
       {" | "}
       <Link to="/">Back to Home</Link>
       {" | "}
-      <button onClick={() => deletePost}>Delete</button>
+      <button onClick={() => deletePost(post.id)}>Delete</button>
     </div>
   );
 }
