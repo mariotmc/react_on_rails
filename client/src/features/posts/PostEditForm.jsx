@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { API_URL } from "../../constants";
+import { fetchPostById, updatePost } from "../../services/postService";
 
 function PostEditForm() {
   const { id } = useParams();
@@ -9,49 +9,39 @@ function PostEditForm() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function fetchCurrentPost() {
-      try {
-        const response = await fetch(`${API_URL}/${id}`);
-        if (response.ok) {
-          const json = await response.json();
-          setPost(json);
-        } else {
-          setError(new Error("Failed to fetch post"));
-        }
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchCurrentPost() {
+    try {
+      const json = await fetchPostById(id);
+      setPost(json);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const updatedPost = {
+      title: post.title,
+      body: post.body,
+    };
+
+    try {
+      const response = await updatePost(id, updatedPost);
+      navigate(`/posts/${response.id}`);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  useEffect(() => {
     fetchCurrentPost();
   }, [id]);
 
   if (loading || !post) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: post.title, body: post.body }),
-      });
-      if (response.ok) {
-        const json = await response.json();
-        setPost(json);
-        navigate(`/posts/${id}`);
-      } else {
-        setError(new Error("Failed to update post"));
-      }
-    } catch (error) {
-      setError(error);
-    }
-  };
 
   return (
     <div>
