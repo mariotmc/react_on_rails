@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchAllPosts, deletePost } from "../../services/postService";
 import { Link } from "react-router-dom";
+import "../../assets/css/PostImage.css";
 
 function PostsList() {
   const [posts, setPosts] = useState([]);
@@ -35,7 +36,7 @@ function PostsList() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div>
+    <div className="posts-list-container">
       {posts.map((post) => (
         <div key={post.id} className="post-container">
           <h2>
@@ -43,6 +44,15 @@ function PostsList() {
               {post.title}
             </Link>
           </h2>
+          {post.image_url ? (
+            <div className="post-image-container">
+              <img src={post.image_url} alt={post.title} className="post-image" />
+            </div>
+          ) : (
+            <div className="post-image-placeholder">
+              <p>No image available</p>
+            </div>
+          )}
           <div className="post-links">
             <button onClick={() => deletePostHandler(post.id)}>Delete</button>
             <Link to={`/posts/${post.id}/edit`}>Edit</Link>

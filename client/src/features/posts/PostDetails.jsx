@@ -39,6 +39,7 @@ function PostDetails() {
   return (
     <div>
       <h2>{post.title}</h2>
+      {post.image_url && <img src={post.image_url} alt={post.title} className="post-image" />}
       <p>{post.body}</p>
       <Link to={`/posts/${post.id}/edit`}>Edit</Link>
       {" | "}
