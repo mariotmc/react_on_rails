@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { fetchPostById, updatePost } from "../../services/postService";
 import PostForm from "./PostForm";
+import { objectToFormData } from "../../utils/formDataHelper";
 
 function PostEditForm() {
   const { id } = useParams();
@@ -17,7 +18,14 @@ function PostEditForm() {
     }
   }
 
-  const handleUpdateSubmit = async (formData) => {
+  const handleUpdateSubmit = async (rawData) => {
+    const sanitizedData = {
+      title: rawData.title,
+      body: rawData.body,
+      image: rawData.image,
+    };
+    const formData = objectToFormData({ post: sanitizedData });
+
     try {
       const response = await updatePost(id, formData);
       navigate(`/posts/${response.id}`);
